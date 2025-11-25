@@ -15,9 +15,10 @@ export async function POST(req: NextRequest) {
     }
 
     const existingUser = await db.user.findUnique({ where: { email } });
+
     if (existingUser) {
       return NextResponse.json(
-        { message: "Email already registered" },
+        { message: "This email is already registered" },
         { status: 400 }
       );
     }
@@ -39,12 +40,14 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(
-      { message: "User created. Verify your email." },
+      { message: "Signup successful! Check your email to verify your account." },
       { status: 201 }
     );
-  } catch {
+  } catch (err) {
+    console.error(err);
+
     return NextResponse.json(
-      { message: "Server error" },
+      { message: "Something went wrong on the server." },
       { status: 500 }
     );
   }

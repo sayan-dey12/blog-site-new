@@ -20,7 +20,7 @@ export default function SignupPage() {
     setMounted(true);
   }, []);
 
-  if (!mounted) return null; // Prevent hydration mismatch
+  if (!mounted) return null; // Avoid hydration mismatch
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -28,15 +28,28 @@ export default function SignupPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Client-side validation
+    if (!form.username.trim() || !form.email.trim() || !form.password.trim()) {
+      toast.error("All fields are required");
+      return;
+    }
+
     setLoading(true);
+
     try {
-      const response = await axios.post('/api/auth/signup', form);
-      console.log("signup success", response.data);
+      const res = await axios.post("/api/auth/signup", form);
+
+      toast.success(res.data.message || "Account created! Verify your email.");
+
       router.push("/login");
-      toast.success("Signup successful! Check your email to verify your account.", { duration: 3000 });
-    } catch (error: any) {
-      console.log("signup fails", error.message);
-      toast.error(error.response?.data?.message || "Signup failed", { duration: 3000 });
+    } catch (err: any) {
+      const message =
+        err.response?.data?.message ||
+        err.message ||
+        "Signup failed. Please try again.";
+
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -52,11 +65,10 @@ export default function SignupPage() {
 
         <CardContent>
           <form onSubmit={handleSubmit} id="signup-form" className="space-y-4">
-            {/* Username */}
             <div className="grid gap-2">
               <Label htmlFor="username">Username</Label>
               <Input
-                id="username" // needed for accessibility
+                id="username"
                 name="username"
                 value={form.username}
                 onChange={handleChange}
@@ -65,7 +77,6 @@ export default function SignupPage() {
               />
             </div>
 
-            {/* Email */}
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -79,7 +90,6 @@ export default function SignupPage() {
               />
             </div>
 
-            {/* Password */}
             <div className="grid gap-2">
               <Label htmlFor="password">Password</Label>
               <Input
@@ -103,7 +113,7 @@ export default function SignupPage() {
             className="w-full"
           >
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Sign Up
+            {loading ? "Creating account..." : "Sign Up"}
           </Button>
         </CardFooter>
       </Card>
