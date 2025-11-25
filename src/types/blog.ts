@@ -1,14 +1,36 @@
 // src/types/blog.ts
-export type Blog = {
+export type TagType = {
+  id: string;
+  name: string;
+};
+
+export type CategoryType = {
+  id: string;
+  name: string;
+};
+
+export type AuthorType = {
+  id: string;
+  name?: string | null;
+  email?: string;
+  image?: string | null;
+};
+
+export type BlogType = {
   id: string;
   title: string;
   slug: string;
-  excerpt?: string;
-  coverImage?: string;
-  category?: string;
-  readingTime?: number; // ✅ FIXED
-  publishedAt?: string;
-  authorName?: string;
-  authorAvatar?: string;
-  isTrending?: boolean;
+  content: string;
+  coverImage?: string | null;
+  excerpt?: string | null;
+  readingTime?: number | null;
+  published: boolean;
+  authorId: string;
+  author?: AuthorType | null;
+  categoryId?: string | null;
+  category?: CategoryType | null;
+  tags?: TagType[];
+  views: number;
+  createdAt: string;
+  updatedAt: string;
 };

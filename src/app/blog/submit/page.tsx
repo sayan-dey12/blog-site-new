@@ -16,17 +16,15 @@ import {
   SelectTrigger,
   SelectValue,
   SelectContent,
-  SelectItem
+  SelectItem,
 } from "@/components/ui/select";
 
-// ✅ Markdown Editor
 const MDEditor = dynamic(() => import("@uiw/react-md-editor"), { ssr: false });
 import { commands as defaultCommands, ICommand } from "@uiw/react-md-editor";
 
 export default function BlogSubmitPage() {
   const router = useRouter();
   const { loggedIn, mounted } = useAuth();
-  const editorRef = useRef<HTMLDivElement | null>(null);
 
   const [hydrated, setHydrated] = useState(false);
 
@@ -37,12 +35,13 @@ export default function BlogSubmitPage() {
   const [category, setCategory] = useState("");
   const [content, setContent] = useState("");
   const [coverImage, setCoverImage] = useState<File | null>(null);
+
   const [submitting, setSubmitting] = useState(false);
 
-  // ✅ Prevent hydration mismatch
+  // Prevent hydration mismatch
   useEffect(() => setHydrated(true), []);
 
-  // ✅ Redirect if not logged in
+  // Redirect if not logged in
   useEffect(() => {
     if (mounted && !loggedIn) {
       toast.error("Please log in to write a blog.");
@@ -50,28 +49,30 @@ export default function BlogSubmitPage() {
     }
   }, [mounted, loggedIn, router]);
 
-  // ✅ Auto slug
+  // Auto slug generation
   useEffect(() => {
-    setSlug(slugify(title, { lower: true }));
+    const newSlug = slugify(title, { lower: true, strict: true });
+    setSlug(newSlug);
   }, [title]);
 
-  // ✅ Upload Inserted Image
+  // Image upload inside markdown editor
   const handleImageUpload = async (file: File) => {
     const fd = new FormData();
     fd.append("file", file);
 
     try {
       const res = await fetch("/api/upload", { method: "POST", body: fd });
+      if (!res.ok) throw new Error("Upload failed");
+
       const { url } = await res.json();
 
       setContent((prev) => prev + `\n\n![image](${url})`);
       toast.success("Image uploaded");
-    } catch {
+    } catch (err) {
       toast.error("Image upload failed");
     }
   };
 
-  // ✅ Toolbar Image Button (No Emoji)
   const imageCommand: ICommand = {
     name: "image-upload",
     keyCommand: "image",
@@ -91,19 +92,25 @@ export default function BlogSubmitPage() {
 
   const commands: ICommand[] = [...defaultCommands.getCommands(), imageCommand];
 
-  // ✅ Submit Blog
+  // Submit blog
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
-    if (!title || !excerpt || !content || !category || !coverImage) {
-      toast.error("All fields are required");
-      return;
+    // Client-side validation
+    if (!title.trim()) return toast.error("Title is required");
+    if (!category.trim()) return toast.error("Select a category");
+    if (!excerpt.trim()) return toast.error("Excerpt is required");
+    if (!content.trim()) return toast.error("Content is required");
+    if (!coverImage) return toast.error("Cover image is required");
+
+    if (!slug || slug.length < 3) {
+      return toast.error("Invalid slug generated. Enter a longer title.");
     }
 
     setSubmitting(true);
 
     try {
-      // Upload cover
+      // 1. Upload cover image
       const fd = new FormData();
       fd.append("file", coverImage);
 
@@ -112,9 +119,10 @@ export default function BlogSubmitPage() {
         body: fd,
       });
 
-      const { url } = await uploadRes.json();
+      if (!uploadRes.ok) throw new Error("Image upload failed");
+      const { url: coverUrl } = await uploadRes.json();
 
-      // Submit blog
+      // 2. Submit blog
       const res = await fetch("/api/blog/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -124,18 +132,26 @@ export default function BlogSubmitPage() {
           excerpt,
           content,
           category,
-          coverImage: url,
-          tags: tags.split(",").map((t) => t.trim()),
+          coverImage: coverUrl,
+          tags: tags.split(",").map((t) => t.trim()).filter(Boolean),
           published: true,
         }),
       });
 
-      if (!res.ok) throw new Error();
+      const data = await res.json();
 
+      if (!res.ok) {
+        toast.error(data.message || "Failed to publish blog");
+        throw new Error();
+      }
+
+      // Use the slug returned from backend (unique guaranteed)
+      const finalSlug = data.blog.slug;
       toast.success("Blog published successfully!");
-      router.push(`/blog/${slug}`);
-    } catch {
-      toast.error("Failed to publish blog");
+
+      router.push(`/blog/${finalSlug}`);
+    } catch (err: any) {
+      toast.error(err.message || "Failed to publish blog");
     } finally {
       setSubmitting(false);
     }
@@ -150,11 +166,15 @@ export default function BlogSubmitPage() {
       <Label>Title</Label>
       <Input value={title} onChange={(e) => setTitle(e.target.value)} />
 
-      <Label>Slug</Label>
+      <Label>Slug (auto-generated)</Label>
       <Input value={slug} disabled />
 
       <Label>Excerpt</Label>
-      <Textarea value={excerpt} onChange={(e) => setExcerpt(e.target.value)} />
+      <Textarea
+        value={excerpt}
+        onChange={(e) => setExcerpt(e.target.value)}
+        maxLength={250}
+      />
 
       <Label>Category</Label>
       <Select onValueChange={setCategory}>
@@ -168,8 +188,12 @@ export default function BlogSubmitPage() {
         </SelectContent>
       </Select>
 
-      <Label>Tags</Label>
-      <Input value={tags} onChange={(e) => setTags(e.target.value)} />
+      <Label>Tags (comma separated)</Label>
+      <Input
+        placeholder="ai, nextjs, coding"
+        value={tags}
+        onChange={(e) => setTags(e.target.value)}
+      />
 
       <Label>Content</Label>
       <div className="border rounded-md p-2">
