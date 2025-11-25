@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { marked } from "marked";
 import AuthorCard from "@/components/blog/AuthorCard";
+import "@/styles/markdown.css"; // 👈 custom markdown styling
 
 export const dynamic = "force-dynamic";
 
@@ -30,11 +31,12 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
 export default async function SingleBlogPage(props: {
   params: Promise<{ slug: string }>;
 }) {
-  // Turbopack params:
+  // Turbopack: params is a Promise
   const { slug } = await props.params;
 
   if (!slug || slug.trim().length < 1) return notFound();
 
+  // Fetch blog
   const blog = await db.blog.findUnique({
     where: { slug },
     include: {
@@ -46,10 +48,10 @@ export default async function SingleBlogPage(props: {
 
   if (!blog) return notFound();
 
-  // Markdown -> HTML
+  // Markdown → HTML
   const htmlContent = await marked.parse(blog.content || "");
 
-  // Increment views
+  // Increment views (non-blocking)
   db.blog
     .update({
       where: { id: blog.id },
@@ -70,11 +72,14 @@ export default async function SingleBlogPage(props: {
 
       {/* 🌟 Header Section */}
       <div className="relative mb-10 rounded-3xl overflow-hidden shadow-xl">
+        {/* Blurred background */}
         <img
           src={blog.coverImage || "/images/fallback.png"}
           alt={blog.title}
           className="w-full h-[380px] object-cover blur-sm opacity-60 absolute inset-0"
         />
+
+        {/* Main image */}
         <img
           src={blog.coverImage || "/images/fallback.png"}
           alt={blog.title}
@@ -115,15 +120,9 @@ export default async function SingleBlogPage(props: {
         </div>
       )}
 
-      {/* 📝 Content */}
+      {/* 📝 Content (CUSTOM MARKDOWN CSS APPLIED) */}
       <div
-        className="prose dark:prose-invert max-w-none
-          prose-headings:font-bold prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl
-          prose-img:rounded-xl prose-img:mx-auto prose-img:max-w-[750px]
-          prose-pre:bg-gray-900 dark:prose-pre:bg-black prose-pre:text-gray-100
-          prose-pre:shadow-xl prose-pre:rounded-xl
-          prose-code:bg-gray-200 dark:prose-code:bg-gray-800 prose-code:px-1 prose-code:py-0.5 prose-code:rounded
-          prose-blockquote:border-l-purple-500 prose-blockquote:bg-purple-50 dark:prose-blockquote:bg-purple-900/20 prose-blockquote:p-3 prose-blockquote:rounded"
+        className="markdown text-base leading-relaxed dark:text-gray-200"
         dangerouslySetInnerHTML={{ __html: htmlContent }}
       />
 

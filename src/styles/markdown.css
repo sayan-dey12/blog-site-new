@@ -1,0 +1,83 @@
+.markdown h1 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.markdown h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-top: 1.8rem;
+  margin-bottom: 0.8rem;
+}
+
+.markdown h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.7rem;
+}
+
+.markdown p {
+  margin: 1rem 0;
+  line-height: 1.75;
+}
+
+.markdown ul,
+.markdown ol {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+}
+
+.markdown ul li {
+  list-style: disc;
+  margin: 0.3rem 0;
+}
+
+.markdown ol li {
+  list-style: decimal;
+  margin: 0.3rem 0;
+}
+
+.markdown blockquote {
+  border-left: 4px solid #a855f7;
+  padding: 0.8rem 1rem;
+  margin: 1.5rem 0;
+  background: rgba(168, 85, 247, 0.05);
+  border-radius: 0.5rem;
+  font-style: italic;
+  color: #555;
+}
+
+.dark .markdown blockquote {
+  background: rgba(168, 85, 247, 0.15);
+  color: #ddd;
+}
+
+.markdown pre {
+  background: #1e1e1e;
+  color: #f3f3f3;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+}
+
+.markdown code {
+  background: rgba(0, 0, 0, 0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.dark .markdown code {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.markdown img {
+  margin: 2rem auto;
+  border-radius: 1rem;
+  display: block;
+  max-width: 100%;
+}
