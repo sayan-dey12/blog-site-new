@@ -3,20 +3,38 @@
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { marked } from "marked";
+import AuthorCard from "@/components/blog/AuthorCard";
 
 export const dynamic = "force-dynamic";
+
+// --- SEO Meta ---
+export async function generateMetadata(props: { params: Promise<{ slug: string }> }) {
+  const { slug } = await props.params;
+
+  const blog = await db.blog.findUnique({ where: { slug } });
+
+  if (!blog) return {};
+
+  return {
+    title: blog.title,
+    description: blog.excerpt || blog.title,
+    openGraph: {
+      title: blog.title,
+      description: blog.excerpt || blog.title,
+      images: [{ url: blog.coverImage || "" }],
+      type: "article",
+    },
+  };
+}
 
 export default async function SingleBlogPage(props: {
   params: Promise<{ slug: string }>;
 }) {
-  // 🔥 Turbopack passes params as a Promise — must await it
+  // Turbopack params:
   const { slug } = await props.params;
 
-  if (!slug || slug.trim().length < 1) {
-    return notFound();
-  }
+  if (!slug || slug.trim().length < 1) return notFound();
 
-  // Fetch blog
   const blog = await db.blog.findUnique({
     where: { slug },
     include: {
@@ -28,80 +46,98 @@ export default async function SingleBlogPage(props: {
 
   if (!blog) return notFound();
 
-  // Convert markdown
+  // Markdown -> HTML
   const htmlContent = await marked.parse(blog.content || "");
 
-  // Increment views (non-blocking)
+  // Increment views
   db.blog
     .update({
       where: { id: blog.id },
-      data: { views: blog.views + 1 },
+      data: { views: (blog.views ?? 0) + 1 },
     })
     .catch(() => {});
 
-  const authorName = blog.author?.name ?? "Unknown Author";
-  const authorAvatar =
-    blog.author?.image ?? "/images/avatar-placeholder.png";
+  const readingTime = blog.readingTime ?? 1;
   const categoryName = blog.category?.name ?? "General";
-
-  const publishedDate = new Date(blog.createdAt).toLocaleDateString(
-    "en-US",
-    {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    }
-  );
+  const publishedDate = new Date(blog.createdAt).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 
   return (
-    <article className="max-w-3xl mx-auto px-4 py-10">
+    <article className="max-w-4xl mx-auto px-4 py-10">
 
-      <div className="overflow-hidden rounded-2xl mb-6">
+      {/* 🌟 Header Section */}
+      <div className="relative mb-10 rounded-3xl overflow-hidden shadow-xl">
         <img
           src={blog.coverImage || "/images/fallback.png"}
           alt={blog.title}
-          className="w-full max-h-[600px] object-cover rounded-2xl"
+          className="w-full h-[380px] object-cover blur-sm opacity-60 absolute inset-0"
+        />
+        <img
+          src={blog.coverImage || "/images/fallback.png"}
+          alt={blog.title}
+          className="relative w-full h-[380px] object-contain z-10"
         />
       </div>
 
-      <h1 className="text-4xl font-bold mb-3">{blog.title}</h1>
+      {/* Title */}
+      <h1 className="text-4xl md:text-5xl font-extrabold mb-5 tracking-tight">
+        {blog.title}
+      </h1>
 
-      <div className="flex justify-between text-sm text-gray-500 mb-6">
-        <p>
-          {publishedDate} • {blog.readingTime} min read • {categoryName}
-        </p>
+      {/* Meta Info */}
+      <div className="flex flex-wrap items-center gap-4 text-gray-600 dark:text-gray-400 text-sm mb-8">
 
-        <div className="flex gap-2 flex-wrap">
-          {blog.tags?.map((t) => (
+        <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 rounded-full text-blue-700 dark:text-blue-300 font-medium">
+          {categoryName}
+        </span>
+
+        <span>{publishedDate}</span>
+
+        <span className="px-2 py-1 bg-purple-100 dark:bg-purple-900/30 rounded-full text-purple-700 dark:text-purple-300">
+          {readingTime} min read
+        </span>
+      </div>
+
+      {/* Tags */}
+      {blog.tags?.length > 0 && (
+        <div className="flex gap-2 flex-wrap mb-8">
+          {blog.tags.map((tag) => (
             <span
-              key={t.id}
-              className="bg-purple-100 text-purple-600 px-3 py-1 rounded-full text-xs"
+              key={tag.id}
+              className="px-3 py-1 rounded-full bg-gray-200 dark:bg-gray-800 text-xs text-gray-700 dark:text-gray-300"
             >
-              #{t.name}
+              #{tag.name}
             </span>
           ))}
         </div>
-      </div>
+      )}
 
+      {/* 📝 Content */}
       <div
-        className="prose dark:prose-invert max-w-none"
+        className="prose dark:prose-invert max-w-none
+          prose-headings:font-bold prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl
+          prose-img:rounded-xl prose-img:mx-auto prose-img:max-w-[750px]
+          prose-pre:bg-gray-900 dark:prose-pre:bg-black prose-pre:text-gray-100
+          prose-pre:shadow-xl prose-pre:rounded-xl
+          prose-code:bg-gray-200 dark:prose-code:bg-gray-800 prose-code:px-1 prose-code:py-0.5 prose-code:rounded
+          prose-blockquote:border-l-purple-500 prose-blockquote:bg-purple-50 dark:prose-blockquote:bg-purple-900/20 prose-blockquote:p-3 prose-blockquote:rounded"
         dangerouslySetInnerHTML={{ __html: htmlContent }}
       />
 
-      <div className="mt-10 flex items-center justify-end gap-3">
-        <img
-          src={authorAvatar}
-          alt={authorName}
-          className="w-8 h-8 rounded-full"
-        />
-        <p className="text-sm text-gray-500 italic">
-          Written by {authorName}
-        </p>
-      </div>
+      {/* Author */}
+      <AuthorCard author={blog.author} />
 
-      <p className="text-right text-xs mt-4 text-gray-400">
+      {/* Views */}
+      <p className="text-right text-xs mt-6 text-gray-400">
         {(blog.views ?? 0) + 1} views
       </p>
+
+      <div className="mt-16 border-t pt-8 text-center text-sm text-gray-500 dark:text-gray-400">
+        • End of Article •
+      </div>
     </article>
   );
 }

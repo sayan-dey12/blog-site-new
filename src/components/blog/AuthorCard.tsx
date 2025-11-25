@@ -1,5 +1,4 @@
 // src/components/blog/AuthorCard.tsx
-import React from "react";
 
 type Props = {
   author?: {
@@ -11,20 +10,21 @@ type Props = {
 };
 
 export default function AuthorCard({ author }: Props) {
-  const displayName = author?.name || "Unknown Author";
+  const name = author?.name || "Unknown Author";
   const avatar = author?.image || "/images/avatar-fallback.png";
 
   return (
-    <div className="flex items-center gap-3 mt-8">
+    <div className="flex items-center gap-4 mt-10 border-t pt-6">
       <img
         src={avatar}
-        alt={displayName}
-        className="w-12 h-12 rounded-full object-cover"
+        alt={name}
+        className="w-12 h-12 rounded-full object-cover ring-2 ring-purple-400/20"
       />
+
       <div>
-        <div className="text-sm font-medium">{displayName}</div>
+        <p className="text-sm font-semibold">{name}</p>
         {author?.email && (
-          <div className="text-xs text-muted-foreground">{author.email}</div>
+          <p className="text-xs text-gray-500">{author.email}</p>
         )}
       </div>
     </div>
