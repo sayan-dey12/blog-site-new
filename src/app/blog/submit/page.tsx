@@ -186,7 +186,11 @@ export default function BlogSubmitPage() {
           <SelectItem value="ai">AI</SelectItem>
           <SelectItem value="webdev">Web Development</SelectItem>
           <SelectItem value="case_study">Case Study</SelectItem>
+          <SelectItem value="devops">DevOps</SelectItem>
+          <SelectItem value="programming">Programming</SelectItem>
           <SelectItem value="career_journey">Career Journey</SelectItem>
+          <SelectItem value="productivity">Productivity</SelectItem>
+          <SelectItem value="backend">Backend</SelectItem>
 
         </SelectContent>
       </Select>
