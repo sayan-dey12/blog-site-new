@@ -5,7 +5,7 @@ import { Calendar, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import type { BlogType } from "@/types/blog";
+import type { BlogType  } from "@/types/blog";
 
 type BlogCardProps = {
   blog: BlogType;

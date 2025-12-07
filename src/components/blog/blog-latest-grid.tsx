@@ -1,11 +1,10 @@
-// src/components/blog/blog-latest-grid.tsx
-import { Blog } from "@/types/blog";
+import { BlogType } from "@/types/blog";
 import { SectionHeader } from "@/components/shared/section-header";
 import { BlogCard } from "./blog-card";
 import { BlogCardSkeleton } from "./blog-card-skeleton";
 
 type BlogLatestGridProps = {
-  blogs: Blog[];
+  blogs: BlogType[];
   isLoading: boolean;
 };
 
@@ -16,6 +15,7 @@ export function BlogLatestGrid({ blogs, isLoading }: BlogLatestGridProps) {
         title="Latest articles"
         subtitle="Fresh from the keyboard."
       />
+
       <div className="grid gap-4 md:grid-cols-3">
         {isLoading
           ? Array.from({ length: 6 }).map((_, idx) => (

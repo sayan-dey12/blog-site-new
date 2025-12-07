@@ -1,10 +1,9 @@
-// src/components/blog/blog-trending.tsx
-import { Blog } from "@/types/blog";
+import { BlogType } from "@/types/blog";
 import { SectionHeader } from "@/components/shared/section-header";
 import { BlogCard } from "./blog-card";
 
 type BlogTrendingProps = {
-  blogs: Blog[];
+  blogs: BlogType[];
 };
 
 export function BlogTrending({ blogs }: BlogTrendingProps) {
@@ -16,6 +15,7 @@ export function BlogTrending({ blogs }: BlogTrendingProps) {
         title="Trending now"
         subtitle="Most read and shared this week."
       />
+
       <div className="grid gap-4 md:grid-cols-3">
         {blogs.map((blog, idx) => (
           <BlogCard key={blog.id} blog={blog} index={idx} />

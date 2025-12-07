@@ -1,14 +1,13 @@
-// src/components/blog/blog-featured.tsx
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Blog } from "@/types/blog";
+import { BlogHomeType } from "@/types/home-blog";
 
 type BlogFeaturedProps = {
-  blog: Blog | null;
+  blog: BlogHomeType | null;
 };
 
 export function BlogFeatured({ blog }: BlogFeaturedProps) {
@@ -37,26 +36,30 @@ export function BlogFeatured({ blog }: BlogFeaturedProps) {
               </div>
             )}
           </div>
+
           <div className="p-4 md:p-6">
             <div className="mb-3 flex items-center gap-2 text-xs text-muted-foreground">
               <Badge variant="outline" className="px-2 py-0 text-[10px]">
                 Featured
               </Badge>
+
               <span>
-                {blog.publishedAt
-                  ? new Date(blog.publishedAt).toLocaleDateString()
-                  : "Latest"}
+                {new Date(blog.publishedAt).toLocaleDateString()}
               </span>
-              <span>• {blog.readingTime ?? "6"} min read</span>
+
+              <span>• {blog.readingTime} min read</span>
             </div>
+
             <Link href={`/blog/${blog.slug}`}>
               <h1 className="mb-2 text-xl font-semibold leading-tight md:text-2xl lg:text-3xl">
                 {blog.title}
               </h1>
             </Link>
+
             <p className="mb-4 text-sm text-muted-foreground md:text-base">
               {blog.excerpt}
             </p>
+
             <Button asChild size="sm" className="rounded-full">
               <Link href={`/blog/${blog.slug}`}>
                 Read featured article
@@ -69,19 +72,19 @@ export function BlogFeatured({ blog }: BlogFeaturedProps) {
         <div className="flex flex-col justify-between gap-4 rounded-2xl border bg-muted/40 p-4 md:p-5">
           <div>
             <p className="text-xs font-medium uppercase tracking-[0.16em] text-primary">
-              Sayan&apos;s Picks
+              Sayan's Picks
             </p>
             <h2 className="mt-2 text-lg font-semibold md:text-xl">
               Deep dives into systems, AI and dev journey.
             </h2>
             <p className="mt-2 text-xs text-muted-foreground md:text-sm">
-              Long-form posts, project breakdowns, and honest logs from
-              building real-world apps – curated in one place.
+              Long-form posts, project breakdowns, and logs from building real apps.
             </p>
           </div>
+
           <div className="grid gap-2 text-sm text-muted-foreground">
             <p>✨ No fluff, only practical learnings.</p>
-            <p>🧠 Algorithms, backend, infra, and AI tooling.</p>
+            <p>🧠 Systems, backend, infra, and AI tooling.</p>
             <p>🚀 Written from the perspective of a builder.</p>
           </div>
         </div>
