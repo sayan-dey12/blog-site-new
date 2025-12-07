@@ -4,14 +4,18 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { BlogHomeType } from "@/types/home-blog";
+import { BlogType } from "@/types/blog";
 
 type BlogFeaturedProps = {
-  blog: BlogHomeType | null;
+  blog: BlogType | null;
 };
 
 export function BlogFeatured({ blog }: BlogFeaturedProps) {
   if (!blog) return null;
+
+  const categoryName = blog.category?.name || "General";
+  const publishedAt = new Date(blog.createdAt).toLocaleDateString();
+  const readTime = blog.readingTime ?? 1;
 
   return (
     <section className="mb-8 mt-4 md:mb-12 md:mt-6">
@@ -20,6 +24,7 @@ export function BlogFeatured({ blog }: BlogFeaturedProps) {
         animate={{ opacity: 1, y: 0 }}
         className="grid gap-6 md:grid-cols-[3fr,2fr]"
       >
+        {/* LEFT IMAGE + META */}
         <div className="relative overflow-hidden rounded-2xl border bg-background/80 shadow-sm">
           <div className="relative aspect-16/10 w-full overflow-hidden">
             {blog.coverImage ? (
@@ -32,7 +37,7 @@ export function BlogFeatured({ blog }: BlogFeaturedProps) {
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center bg-muted text-xs text-muted-foreground">
-                Featured image
+                No Image
               </div>
             )}
           </div>
@@ -40,14 +45,11 @@ export function BlogFeatured({ blog }: BlogFeaturedProps) {
           <div className="p-4 md:p-6">
             <div className="mb-3 flex items-center gap-2 text-xs text-muted-foreground">
               <Badge variant="outline" className="px-2 py-0 text-[10px]">
-                Featured
+                {categoryName}
               </Badge>
 
-              <span>
-                {new Date(blog.publishedAt).toLocaleDateString()}
-              </span>
-
-              <span>• {blog.readingTime} min read</span>
+              <span>{publishedAt}</span>
+              <span>• {readTime} min read</span>
             </div>
 
             <Link href={`/blog/${blog.slug}`}>
@@ -69,22 +71,23 @@ export function BlogFeatured({ blog }: BlogFeaturedProps) {
           </div>
         </div>
 
+        {/* RIGHT INFO BOX */}
         <div className="flex flex-col justify-between gap-4 rounded-2xl border bg-muted/40 p-4 md:p-5">
           <div>
             <p className="text-xs font-medium uppercase tracking-[0.16em] text-primary">
-              Sayan's Picks
+              Sayan’s Picks
             </p>
             <h2 className="mt-2 text-lg font-semibold md:text-xl">
               Deep dives into systems, AI and dev journey.
             </h2>
             <p className="mt-2 text-xs text-muted-foreground md:text-sm">
-              Long-form posts, project breakdowns, and logs from building real apps.
+              Technical breakdowns, architecture notes, and insights from building real applications.
             </p>
           </div>
 
           <div className="grid gap-2 text-sm text-muted-foreground">
-            <p>✨ No fluff, only practical learnings.</p>
-            <p>🧠 Systems, backend, infra, and AI tooling.</p>
+            <p>✨ No fluff — only practical engineering.</p>
+            <p>🧠 Backend, infra, and AI tooling.</p>
             <p>🚀 Written from the perspective of a builder.</p>
           </div>
         </div>
