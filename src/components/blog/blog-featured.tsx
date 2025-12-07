@@ -47,7 +47,7 @@ export function BlogFeatured({ blog }: BlogFeaturedProps) {
                   ? new Date(blog.publishedAt).toLocaleDateString()
                   : "Latest"}
               </span>
-              <span>• {blog.readingTime ?? "6 min read"}</span>
+              <span>• {blog.readingTime ?? "6"} min read</span>
             </div>
             <Link href={`/blog/${blog.slug}`}>
               <h1 className="mb-2 text-xl font-semibold leading-tight md:text-2xl lg:text-3xl">
