@@ -18,6 +18,7 @@ datasource db {
 model User {
   id                String   @id @default(cuid())
   name              String?
+  username          String?  @unique
   email             String   @unique
   password          String?
   image             String?
@@ -28,10 +29,13 @@ model User {
   verifyTokenExpiry DateTime?
   forgotToken       String?
   forgotTokenExpiry DateTime?
-
-  blogs     Blog[]
-  comments  Comment[]
-  likes     Like[]
+  
+  bio               String?  
+  about             String?
+  
+  blogs             Blog[]
+  comments          Comment[]
+  likes             Like[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
