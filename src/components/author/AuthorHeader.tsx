@@ -29,7 +29,7 @@ export default function AuthorHeader({author}:Props){
             )}
 
             <p className="text-xs text-muted-foreground">
-            Writing since{" "}
+            Member since{" "}
             {new Date(author.createdAt).toLocaleDateString()}
             </p>
         </div>
