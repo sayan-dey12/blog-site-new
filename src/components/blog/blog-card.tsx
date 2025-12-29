@@ -1,3 +1,4 @@
+'use client';
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -15,9 +16,13 @@ type BlogCardProps = {
 
 export function BlogCard({ blog, index = 0, large = false }: BlogCardProps) {
   // Correct date — BlogType uses createdAt
-  const dateLabel = blog.createdAt
-    ? new Date(blog.createdAt).toLocaleDateString()
-    : "Unknown";
+ const dateLabel = blog.createdAt
+  ? new Date(blog.createdAt).toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    })
+  : "Unknown";
 
   // Author initials (safe)
   const authorName = blog.author?.name || "Guest Author";

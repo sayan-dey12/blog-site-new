@@ -6,6 +6,6 @@ export type PublicAuthorType = {
     image: string | null;
     bio: string | null;      
     about: string | null;  
-    joinedAt: string;      
+    createdAt: string;      
     blogs: BlogType[];
 }
