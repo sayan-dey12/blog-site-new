@@ -12,6 +12,7 @@ export type CategoryType = {
 export type AuthorType = {
   id: string;
   name?: string | null;
+  username?: string | null;
   email?: string;
   image?: string | null;
 };

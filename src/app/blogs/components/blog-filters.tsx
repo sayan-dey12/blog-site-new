@@ -3,15 +3,15 @@
 import { LayoutGrid, List } from "lucide-react";
 
 type BlogFiltersProps = {
-  categories: string[];
+  categories?: string[]; // optional at runtime
   selected: string;
   onCategoryChange: (c: string) => void;
   mode: "grid" | "list";
   onModeChange: (m: "grid" | "list") => void;
 };
 
-export function BlogFilters({
-  categories,
+export default function BlogFilters({
+  categories = [],
   selected,
   onCategoryChange,
   mode,
@@ -19,8 +19,7 @@ export function BlogFilters({
 }: BlogFiltersProps) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
-      
-      {/* ✅ Categories */}
+      {/* Categories */}
       <div className="flex gap-2 overflow-x-auto">
         <button
           onClick={() => onCategoryChange("all")}
@@ -48,7 +47,7 @@ export function BlogFilters({
         ))}
       </div>
 
-      {/* ✅ Dual Mode Toggle */}
+      {/* Layout toggle */}
       <div className="flex gap-2">
         <button
           onClick={() => onModeChange("grid")}
@@ -72,7 +71,6 @@ export function BlogFilters({
           <List className="h-4 w-4" />
         </button>
       </div>
-
     </div>
   );
 }

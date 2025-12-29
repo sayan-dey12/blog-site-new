@@ -1,34 +1,36 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Blog } from "@/types/blog";
+import type { BlogType } from "@/types/blog";
 import { BlogCard } from "@/components/blog/blog-card";
 import { BlogCardSkeleton } from "@/components/blog/blog-card-skeleton";
-import { BlogFilters } from "./components/blog-filters";
+import  BlogFilters  from "./components/blog-filters";
 
-export function BlogPageClient({ blogs }: { blogs: Blog[] }) {
+export function BlogPageClient({ blogs }: { blogs: BlogType[] }) {
   const [category, setCategory] = useState("all");
   const [mode, setMode] = useState<"grid" | "list">("grid");
 
-  // ✅ Extract unique categories
-  const categories = useMemo(
-    () => [...new Set(blogs.map((b) => b.category ?? "General"))],
-    [blogs]
-  );
+  // ✅ Extract unique category names
+  const categories = useMemo(() => {
+    const names = blogs.map(
+      (b) => b.category?.name ?? "General"
+    );
+    return Array.from(new Set(names));
+  }, [blogs]);
 
-  // ✅ Filter blogs
+  // ✅ Filter blogs by category name
   const filteredBlogs = useMemo(() => {
     if (category === "all") return blogs;
-    return blogs.filter((b) => b.category === category);
+
+    return blogs.filter(
+      (b) => (b.category?.name ?? "General") === category
+    );
   }, [blogs, category]);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6">
-
-      {/* ✅ Title */}
       <h1 className="text-2xl font-bold mb-4">All Blogs</h1>
 
-      {/* ✅ Filters */}
       <BlogFilters
         categories={categories}
         selected={category}
@@ -37,7 +39,6 @@ export function BlogPageClient({ blogs }: { blogs: Blog[] }) {
         onModeChange={setMode}
       />
 
-      {/* ✅ Blog Layout */}
       <div
         className={`mt-6 grid gap-5 ${
           mode === "grid"
@@ -46,9 +47,13 @@ export function BlogPageClient({ blogs }: { blogs: Blog[] }) {
         }`}
       >
         {blogs.length === 0 ? (
-          Array.from({ length: 6 }).map((_, i) => <BlogCardSkeleton key={i} />)
+          Array.from({ length: 6 }).map((_, i) => (
+            <BlogCardSkeleton key={i} />
+          ))
         ) : (
-          filteredBlogs.map((blog) => <BlogCard key={blog.id} blog={blog} />)
+          filteredBlogs.map((blog) => (
+            <BlogCard key={blog.id} blog={blog} />
+          ))
         )}
       </div>
     </div>
