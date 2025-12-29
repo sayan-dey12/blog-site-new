@@ -21,7 +21,6 @@ export default function AuthorHeader({author}:Props){
             <h1 className="text-2xl font-bold">
             {author.name ?? "Anonymous Author"}
             </h1>
-
             {author.bio && (
             <p className="text-sm text-muted-foreground max-w-md">
                 {author.bio}

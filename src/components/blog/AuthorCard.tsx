@@ -4,6 +4,7 @@ type Props = {
   author?: {
     id: string;
     name?: string | null;
+    username?: string | null;
     image?: string | null;
     email?: string | null;
   } | null;
@@ -23,8 +24,8 @@ export default function AuthorCard({ author }: Props) {
 
       <div>
         <p className="text-sm font-semibold">{name}</p>
-        {author?.email && (
-          <p className="text-xs text-gray-500">{author.email}</p>
+        {author?.username && (
+          <p className="text-xs text-gray-500">{author.username}</p>
         )}
       </div>
     </div>

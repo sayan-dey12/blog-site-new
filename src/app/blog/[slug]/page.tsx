@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { marked } from "marked";
 import AuthorCard from "@/components/blog/AuthorCard";
 import "@/styles/markdown.css"; // 👈 custom markdown styling
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -92,6 +93,12 @@ export default async function SingleBlogPage(props: {
         {blog.title}
       </h1>
 
+      <div className="mt-3 mb-6 text-sm text-gray-600 dark:text-gray-400">
+        <Link href={`/author/${blog.author.username}`}
+          className="font-medium text-gray-900 dark:text-gray-100 hover:underline">
+          <AuthorCard author={blog.author} />
+        </Link>
+      </div>
       {/* Meta Info */}
       <div className="flex flex-wrap items-center gap-4 text-gray-600 dark:text-gray-400 text-sm mb-8">
 
@@ -126,8 +133,6 @@ export default async function SingleBlogPage(props: {
         dangerouslySetInnerHTML={{ __html: htmlContent }}
       />
 
-      {/* Author */}
-      <AuthorCard author={blog.author} />
 
       {/* Views */}
       <p className="text-right text-xs mt-6 text-gray-400">
