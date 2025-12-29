@@ -18,51 +18,54 @@ export function BlogFeatured({ blog }: BlogFeaturedProps) {
   const readTime = blog.readingTime ?? 1;
 
   return (
-    <section className="mb-8 mt-4 md:mb-12 md:mt-6">
+    <section className="mt-10 mb-20">
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 25 }}
         animate={{ opacity: 1, y: 0 }}
-        className="grid gap-6 md:grid-cols-[3fr,2fr]"
+        transition={{ duration: 0.4 }}
+        className="grid gap-10 lg:grid-cols-[6fr,4fr] items-start"
       >
-        {/* LEFT IMAGE + META */}
-        <div className="relative overflow-hidden rounded-2xl border bg-background/80 shadow-sm">
-          <div className="relative aspect-16/10 w-full overflow-hidden">
+        {/* LEFT — FEATURED BLOG */}
+        <div className="rounded-2xl border bg-background shadow-sm flex flex-col">
+
+          {/* FIXED IMAGE HEIGHT */}
+          <div className="relative w-full aspect-video rounded-t-2xl overflow-hidden">
             {blog.coverImage ? (
               <Image
                 src={blog.coverImage}
                 alt={blog.title}
                 fill
+                className="object-cover"
                 priority
-                className="object-cover transition-transform duration-700 hover:scale-105"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center bg-muted text-xs text-muted-foreground">
+              <div className="flex h-full items-center justify-center bg-muted text-xs text-muted-foreground">
                 No Image
               </div>
             )}
           </div>
 
-          <div className="p-4 md:p-6">
-            <div className="mb-3 flex items-center gap-2 text-xs text-muted-foreground">
+          {/* CONTENT */}
+          <div className="p-6 md:p-8 flex flex-col gap-4">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Badge variant="outline" className="px-2 py-0 text-[10px]">
                 {categoryName}
               </Badge>
-
               <span>{publishedAt}</span>
               <span>• {readTime} min read</span>
             </div>
 
             <Link href={`/blog/${blog.slug}`}>
-              <h1 className="mb-2 text-xl font-semibold leading-tight md:text-2xl lg:text-3xl">
+              <h1 className="text-2xl md:text-3xl font-semibold leading-snug">
                 {blog.title}
               </h1>
             </Link>
 
-            <p className="mb-4 text-sm text-muted-foreground md:text-base">
+            <p className="text-sm text-muted-foreground md:text-base">
               {blog.excerpt}
             </p>
 
-            <Button asChild size="sm" className="rounded-full">
+            <Button asChild size="sm" className="rounded-full w-fit mt-2">
               <Link href={`/blog/${blog.slug}`}>
                 Read featured article
                 <ArrowRight className="ml-1.5 h-4 w-4" />
@@ -71,27 +74,50 @@ export function BlogFeatured({ blog }: BlogFeaturedProps) {
           </div>
         </div>
 
-        {/* RIGHT INFO BOX */}
-        <div className="flex flex-col justify-between gap-4 rounded-2xl border bg-muted/40 p-4 md:p-5">
+        {/* RIGHT — SAYAN'S PICKS */}
+        <div className="rounded-2xl border bg-muted/20 p-6 md:p-8 shadow-sm flex flex-col gap-6 w-full">
+
           <div>
-            <p className="text-xs font-medium uppercase tracking-[0.16em] text-primary">
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-primary">
               Sayan’s Picks
-            </p>
-            <h2 className="mt-2 text-lg font-semibold md:text-xl">
-              Deep dives into systems, AI and dev journey.
+            </h3>
+
+            <h2 className="mt-2 text-xl md:text-2xl font-semibold leading-relaxed">
+              Articles crafted for builders.
             </h2>
-            <p className="mt-2 text-xs text-muted-foreground md:text-sm">
-              Technical breakdowns, architecture notes, and insights from building real applications.
+
+            <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
+              System design, AI tooling, backend architecture, and practical insights
+              learned from building production apps.
             </p>
           </div>
 
-          <div className="grid gap-2 text-sm text-muted-foreground">
-            <p>✨ No fluff — only practical engineering.</p>
-            <p>🧠 Backend, infra, and AI tooling.</p>
-            <p>🚀 Written from the perspective of a builder.</p>
+          <div className="grid gap-4">
+            <MiniPick
+              title="✨ Practical Engineering"
+              subtitle="Hands-on lessons for real-world developers."
+            />
+            <MiniPick
+              title="🧠 AI & System Thinking"
+              subtitle="Mental models for modern engineering."
+            />
+            <MiniPick
+              title="🚀 Scaling Systems"
+              subtitle="Queues, caching, monitoring, and performance."
+            />
           </div>
+
         </div>
       </motion.div>
     </section>
+  );
+}
+
+function MiniPick({ title, subtitle }: { title: string; subtitle: string }) {
+  return (
+    <div className="rounded-xl border bg-background p-4 hover:shadow-md transition shadow-sm">
+      <p className="text-sm font-medium">{title}</p>
+      <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>
+    </div>
   );
 }

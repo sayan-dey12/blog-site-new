@@ -46,15 +46,26 @@ export function BlogHomeContent({ searchQuery }: BlogHomeContentProps) {
   }, [blogs, searchQuery]);
 
   // SECTION SPLITTING
-  const featured: BlogType | null = filtered.length > 0 ? filtered[0] : null;
-  const trending: BlogType[] = filtered.slice(1, 4);
-  const latest: BlogType[] = filtered.slice(4);
+  const featured = filtered[0] ?? null;
+  const trending = filtered.slice(1, 4);
+  const latest = filtered.slice(4);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 pb-10 pt-4 md:px-6 md:pb-16 md:pt-6">
-      <BlogFeatured blog={featured} />
-      <BlogTrending blogs={trending} />
-      <BlogLatestGrid blogs={latest} isLoading={isLoading} />
+    <div className="mx-auto max-w-7xl px-4 pb-20 pt-8 md:px-8">
+      {/* Featured */}
+      <section className="mb-20">
+        <BlogFeatured blog={featured} />
+      </section>
+
+      {/* Trending — shows 3 blogs */}
+      <section className="mb-20">
+        <BlogTrending blogs={trending} />
+      </section>
+
+      {/* Latest */}
+      <section>
+        <BlogLatestGrid blogs={latest} isLoading={isLoading} />
+      </section>
     </div>
   );
 }

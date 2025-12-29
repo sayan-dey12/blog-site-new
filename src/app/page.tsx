@@ -1,11 +1,7 @@
-// src/app/page.tsx
 "use client";
 
 import { useState } from "react";
-import { SiteHeader } from "@/components/layout/site-header";
-import { SiteFooter } from "@/components/layout/site-footer";
 import { BlogHomeContent } from "@/components/blog/blog-home-content";
-
 
 export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState("");
