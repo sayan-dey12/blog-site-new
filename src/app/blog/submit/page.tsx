@@ -191,6 +191,8 @@ export default function BlogSubmitPage() {
           <SelectItem value="career_journey">Career Journey</SelectItem>
           <SelectItem value="productivity">Productivity</SelectItem>
           <SelectItem value="backend">Backend</SelectItem>
+          <SelectItem value="personal_experience">Personal Experience</SelectItem>
+          <SelectItem value="stories">Stories</SelectItem>
 
         </SelectContent>
       </Select>
