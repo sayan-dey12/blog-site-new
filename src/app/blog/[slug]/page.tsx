@@ -4,17 +4,20 @@ import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { marked } from "marked";
 import AuthorCard from "@/components/blog/AuthorCard";
-import "@/styles/markdown.css"; // 👈 custom markdown styling
+import BlogInteractions from "@/components/blog/interractions/BlogInterrections"; // ✅ NEW
+import "@/styles/markdown.css";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 // --- SEO Meta ---
-export async function generateMetadata(props: { params: Promise<{ slug: string }> }) {
+export async function generateMetadata(props: {
+  params: Promise<{ slug: string }>;
+}) {
   const { slug } = await props.params;
 
   const blog = await db.blog.findUnique({ where: { slug } });
-
   if (!blog) return {};
 
   return {
@@ -32,7 +35,6 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
 export default async function SingleBlogPage(props: {
   params: Promise<{ slug: string }>;
 }) {
-  // Turbopack: params is a Promise
   const { slug } = await props.params;
 
   if (!slug || slug.trim().length < 1) return notFound();
@@ -70,17 +72,13 @@ export default async function SingleBlogPage(props: {
 
   return (
     <article className="max-w-4xl mx-auto px-4 py-10">
-
       {/* 🌟 Header Section */}
       <div className="relative mb-10 rounded-3xl overflow-hidden shadow-xl">
-        {/* Blurred background */}
         <img
           src={blog.coverImage || "/images/fallback.png"}
           alt={blog.title}
           className="w-full h-[380px] object-cover blur-sm opacity-60 absolute inset-0"
         />
-
-        {/* Main image */}
         <img
           src={blog.coverImage || "/images/fallback.png"}
           alt={blog.title}
@@ -93,15 +91,18 @@ export default async function SingleBlogPage(props: {
         {blog.title}
       </h1>
 
+      {/* Author */}
       <div className="mt-3 mb-6 text-sm text-gray-600 dark:text-gray-400">
-        <Link href={`/author/${blog.author.username}`}
-          className="font-medium text-gray-900 dark:text-gray-100 hover:underline">
+        <Link
+          href={`/author/${blog.author.username}`}
+          className="font-medium text-gray-900 dark:text-gray-100 hover:underline"
+        >
           <AuthorCard author={blog.author} />
         </Link>
       </div>
+
       {/* Meta Info */}
       <div className="flex flex-wrap items-center gap-4 text-gray-600 dark:text-gray-400 text-sm mb-8">
-
         <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 rounded-full text-blue-700 dark:text-blue-300 font-medium">
           {categoryName}
         </span>
@@ -127,17 +128,19 @@ export default async function SingleBlogPage(props: {
         </div>
       )}
 
-      {/* 📝 Content (CUSTOM MARKDOWN CSS APPLIED) */}
+      {/* 📝 Content */}
       <div
         className="markdown text-base leading-relaxed dark:text-gray-200"
         dangerouslySetInnerHTML={{ __html: htmlContent }}
       />
 
-
       {/* Views */}
       <p className="text-right text-xs mt-6 text-gray-400">
         {(blog.views ?? 0) + 1} views
       </p>
+
+      {/* ❤️ Likes & 💬 Comments (SSR + Client Islands) */}
+      <BlogInteractions blogId={blog.id} />
 
       <div className="mt-16 border-t pt-8 text-center text-sm text-gray-500 dark:text-gray-400">
         • End of Article •
