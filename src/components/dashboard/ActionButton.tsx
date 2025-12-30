@@ -1,10 +1,17 @@
+import Link from "next/link";
 
-export default function ActionButton({label}:{label:string}){
+type ActionButtonProps = {
+  label: string;
+  href: string;
+};
 
-    return(
-        <button className="px-3 py-2 rounded-md border bg-muted hover:bg-muted/70 text-sm">
-            {label}
-        </button>
-    );
-
+export default function ActionButton({ label, href }: ActionButtonProps) {
+  return (
+    <Link
+      href={href}
+      className="inline-flex items-center px-3 py-2 rounded-md border bg-muted hover:bg-muted/70 text-sm"
+    >
+      {label}
+    </Link>
+  );
 }
