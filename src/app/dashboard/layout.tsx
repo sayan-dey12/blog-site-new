@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Menu } from "lucide-react";
 
@@ -9,28 +11,38 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [open, setOpen] = useState(false);
+  const { loggedIn, mounted } = useAuth();
+  const router = useRouter();
 
+  useEffect(() => {
+    if (mounted && !loggedIn) {
+      router.replace("/login");
+    }
+  }, [mounted, loggedIn, router]);
+
+  // ⏳ Wait until auth is checked
+  if (!mounted) {
+    return <div className="p-4">Checking authentication…</div>;
+  }
+
+  // 🚫 Not logged in → nothing renders (redirect happens)
+  if (!loggedIn) {
+    return null;
+  }
+
+  // ✅ Logged in → dashboard UI
   return (
-    // 🔴 Important: h-screen + overflow-hidden
     <div className="h-screen overflow-hidden flex bg-muted">
-      {/* Sidebar */}
-      <Sidebar open={open} onClose={() => setOpen(false)} />
+      <Sidebar open={false} onClose={() => {}} />
 
-      {/* Right side */}
       <div className="flex-1 flex flex-col">
-        {/* Mobile top bar */}
         <header className="md:hidden h-14 bg-background border-b flex items-center px-4">
-          <button
-            onClick={() => setOpen(true)}
-            className="p-2 rounded hover:bg-muted"
-          >
+          <button className="p-2 rounded hover:bg-muted">
             <Menu size={22} />
           </button>
         </header>
 
-        {/* ✅ Scrollable content ONLY */}
-        <main className="flex-1 overflow-y-auto p-4 md:pt-4 pt-16">
+        <main className="flex-1 overflow-y-auto p-4">
           {children}
         </main>
       </div>
