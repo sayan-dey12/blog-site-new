@@ -63,7 +63,7 @@ export function HeroSection() {
           <h1
             key={message.title}
             className="
-              text-3xl sm:text-4xl md:text-6xl
+              mt-5 text-3xl sm:text-4xl md:text-6xl
               font-bold tracking-tight
               max-w-4xl text-white
             "
@@ -88,7 +88,7 @@ export function HeroSection() {
             </Button>
 
             <Button size="lg" variant="outline" asChild>
-              <Link href="#trending">Explore blogs</Link>
+              <Link href="/blogs">Explore blogs</Link>
             </Button>
           </div>
 
