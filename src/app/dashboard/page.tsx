@@ -64,17 +64,25 @@ export default function DashboardPage() {
       </section>
 
       {/* Quick actions */}
-      <section className="p-4 rounded-lg border bg-background">
-        <h2 className="font-semibold mb-3">Quick Actions</h2>
-        <div className="flex flex-wrap gap-2">
-          <ActionButton label="Edit Profile" href="/dashboard/profile" />
-          <ActionButton label="Write New Blog" href="/blog/submit" />
+      <section className="rounded-lg border bg-background p-4 sm:p-6 space-y-4">
+        <h2 className="text-base font-semibold">Quick Actions</h2>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <ActionButton
+            label="Edit Profile"
+            href="/dashboard/profile"
+          />
+          <ActionButton
+            label="Write New Blog"
+            href="/blog/submit"
+          />
           <ActionButton
             label="View Public Profile"
             href={`/author/${user?.username}`}
           />
         </div>
       </section>
+
     </div>
   );
 }
