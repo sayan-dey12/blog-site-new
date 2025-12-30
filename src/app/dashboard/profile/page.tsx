@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
-import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,10 +33,8 @@ export default function ProfilePage() {
       const res = await fetch("/api/profile/me", {
         credentials: "include",
       });
-
       if (!res.ok) throw new Error();
-      const data = await res.json();
-      setProfile(data);
+      setProfile(await res.json());
     } catch {
       toast.error("Failed to load profile");
     } finally {
@@ -62,7 +59,6 @@ export default function ProfilePage() {
     if (!imageFile) return profile?.image ?? null;
 
     setUploading(true);
-
     const fd = new FormData();
     fd.append("file", imageFile);
 
@@ -71,10 +67,9 @@ export default function ProfilePage() {
         method: "POST",
         body: fd,
       });
-
       if (!res.ok) throw new Error();
-      const { url } = await res.json();
 
+      const { url } = await res.json();
       toast.success("Profile image uploaded");
       return url;
     } catch {
@@ -90,17 +85,13 @@ export default function ProfilePage() {
     if (!profile) return;
 
     setSaving(true);
-
     try {
       const imageUrl = await uploadProfileImage();
 
       const res = await fetch("/api/profile/update", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...profile,
-          image: imageUrl,
-        }),
+        body: JSON.stringify({ ...profile, image: imageUrl }),
       });
 
       if (!res.ok) throw new Error();
@@ -120,9 +111,11 @@ export default function ProfilePage() {
   if (loading) return <p className="p-4">Loading profile…</p>;
   if (!profile) return null;
 
+  const avatarSrc =
+    previewImage || profile.image || "/avatar.png";
+
   return (
     <div className="max-w-2xl mx-auto p-4 sm:p-6 space-y-6">
-      {/* Header */}
       <div>
         <h1 className="text-2xl font-bold">Edit Profile</h1>
         <p className="text-sm text-muted-foreground">
@@ -133,15 +126,17 @@ export default function ProfilePage() {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Avatar */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-          <div className="relative h-24 w-24 min-h-24 min-w-24 rounded-full overflow-hidden border shrink-0">
-            <Image
-              src={previewImage || profile.image || "/avatar.png"}
-              alt="Profile image"
-              fill
-              sizes="96px"
-              className="object-cover"
-            />
-          </div>
+          <img
+            src={avatarSrc}
+            alt="Profile"
+            className="
+              h-24 w-24
+              rounded-full
+              object-cover
+              border
+              shrink-0
+            "
+          />
 
           <div className="space-y-2">
             <Input
@@ -161,7 +156,6 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Name */}
         <div className="space-y-1.5">
           <Label>Name</Label>
           <Input
@@ -171,7 +165,6 @@ export default function ProfilePage() {
           />
         </div>
 
-        {/* Username (read-only) */}
         <div className="space-y-1.5">
           <Label>Username</Label>
           <Input
@@ -181,7 +174,6 @@ export default function ProfilePage() {
           />
         </div>
 
-        {/* Bio */}
         <div className="space-y-1.5">
           <Label>Bio</Label>
           <Input
@@ -191,7 +183,6 @@ export default function ProfilePage() {
           />
         </div>
 
-        {/* About */}
         <div className="space-y-1.5">
           <Label>About</Label>
           <Textarea
@@ -202,10 +193,7 @@ export default function ProfilePage() {
           />
         </div>
 
-        <Button
-          disabled={saving || uploading}
-          className="w-full sm:w-auto"
-        >
+        <Button disabled={saving || uploading} className="w-full sm:w-auto">
           {saving
             ? "Saving..."
             : uploading
