@@ -16,13 +16,29 @@ export function BlogLatestGrid({ blogs, isLoading }: BlogLatestGridProps) {
         subtitle="Fresh from the keyboard."
       />
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div
+        className="
+          flex gap-4 overflow-x-auto pb-2
+          snap-x snap-mandatory
+          md:grid md:grid-cols-3 md:gap-6 md:overflow-visible
+        "
+      >
         {isLoading
-          ? Array.from({ length: 6 }).map((_, idx) => (
-              <BlogCardSkeleton key={idx} />
+          ? Array.from({ length: 3 }).map((_, idx) => (
+              <div
+                key={idx}
+                className="min-w-[85%] snap-start md:min-w-0"
+              >
+                <BlogCardSkeleton />
+              </div>
             ))
           : blogs.map((blog, idx) => (
-              <BlogCard key={blog.id} blog={blog} index={idx} />
+              <div
+                key={blog.id}
+                className="min-w-[85%] snap-start md:min-w-0"
+              >
+                <BlogCard blog={blog} index={idx} />
+              </div>
             ))}
       </div>
     </section>

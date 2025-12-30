@@ -2,18 +2,14 @@ import { BlogType } from "@/types/blog";
 import { SectionHeader } from "@/components/shared/section-header";
 import { BlogCard } from "./blog-card";
 
-type BlogTrendingProps = {
-  blogs: BlogType[];
-};
-
-export function BlogTrending({ blogs }: BlogTrendingProps) {
+export function BlogPopularGrid({ blogs }: { blogs: BlogType[] }) {
   if (!blogs.length) return null;
 
   return (
     <section className="mb-10 md:mb-14">
       <SectionHeader
-        title="Trending now"
-        subtitle="What people are reading right now."
+        title="Most popular"
+        subtitle="All-time reader favorites."
       />
 
       <div
