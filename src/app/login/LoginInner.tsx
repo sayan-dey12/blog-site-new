@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { Loader2 } from "lucide-react";
@@ -22,6 +22,17 @@ import { useAuth } from "@/context/AuthContext";
 export default function LoginInner() {
   const { setLoggedIn } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // ✅ read callbackUrl from query
+  const rawCallback = searchParams.get("callbackUrl");
+
+  // ✅ safety: only allow internal redirects
+  const callbackUrl =
+    rawCallback && rawCallback.startsWith("/")
+      ? rawCallback
+      : "/";
+
   const [form, setForm] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
 
@@ -29,19 +40,21 @@ export default function LoginInner() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const res = await axios.post("/api/auth/login", form, {
+      await axios.post("/api/auth/login", form, {
         withCredentials: true,
       });
 
       toast.success("✅ Logged in successfully!");
-      setLoggedIn(true); // ✅ Update global auth state
+      setLoggedIn(true);
 
-      router.push("/blog/submit"); // ✅ Go to protected page
+      // ✅ redirect back to where user came from
+      router.replace(callbackUrl);
+      router.refresh(); // important for SSR components
     } catch (error: any) {
       const msg = error.response?.data?.message;
 
@@ -66,7 +79,11 @@ export default function LoginInner() {
         </CardHeader>
 
         <CardContent>
-          <form id="login-form" className="space-y-4" onSubmit={handleSubmit}>
+          <form
+            id="login-form"
+            className="space-y-4"
+            onSubmit={handleSubmit}
+          >
             <div>
               <Label>Email</Label>
               <Input
@@ -98,12 +115,14 @@ export default function LoginInner() {
             className="w-full"
             disabled={loading}
           >
-            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {loading && (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            )}
             Login
           </Button>
 
           <Link href="/signup" className="text-sm underline text-center">
-            Don't have an account? Sign Up
+            Don&apos;t have an account? Sign Up
           </Link>
         </CardFooter>
       </Card>

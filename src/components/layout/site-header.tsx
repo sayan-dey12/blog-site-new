@@ -17,6 +17,7 @@ import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { useAuth } from "@/context/AuthContext";
 import { SearchBar } from "@/components/search/search-bar";
 import { toast } from "react-hot-toast";
+import { usePathname, useRouter } from "next/navigation";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -30,12 +31,24 @@ export function SiteHeader() {
   const [showSearch, setShowSearch] = useState(false);
 
   const { loggedIn, setLoggedIn } = useAuth();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  // ✅ login redirect preserving current page
+  const loginHref = `/login?callbackUrl=${encodeURIComponent(pathname)}`;
 
   const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "GET" });
-    setLoggedIn(false);
-    toast.success("✅ Logged out successfully");
-    window.location.href = "/";
+    try {
+      await fetch("/api/auth/logout", { method: "GET" });
+      setLoggedIn(false);
+      toast.success("✅ Logged out successfully");
+
+      // refresh + go home
+      router.replace("/");
+      router.refresh();
+    } catch {
+      toast.error("❌ Logout failed");
+    }
   };
 
   useEffect(() => {
@@ -53,10 +66,9 @@ export function SiteHeader() {
           isScrolled ? "shadow-sm" : ""
         }`}
       >
-        {/* ✅ Use gap + ml-auto so logo and right content don't touch */}
         <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3 lg:px-10">
 
-          {/* ✅ Logo */}
+          {/* LOGO */}
           <Link href="/" className="flex items-center gap-2 shrink-0">
             <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-lg font-bold text-primary-foreground shadow">
               S
@@ -71,9 +83,8 @@ export function SiteHeader() {
             </div>
           </Link>
 
-          {/* ✅ Laptop / Desktop (≥ 1024px) */}
+          {/* DESKTOP */}
           <div className="hidden lg:flex items-center gap-6 flex-1 justify-end ml-auto">
-            {/* BIGGER search bar */}
             <div className="flex-1 max-w-3xl">
               <SearchBar />
             </div>
@@ -83,7 +94,7 @@ export function SiteHeader() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="rounded-full px-3 py-1 text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                  className="rounded-full px-3 py-1 text-muted-foreground hover:bg-muted hover:text-foreground"
                 >
                   {link.label}
                 </Link>
@@ -92,18 +103,11 @@ export function SiteHeader() {
 
             <ThemeToggle />
 
-            {!loggedIn && (
-              <Button
-                asChild
-                size="sm"
-                variant="outline"
-                className="rounded-full"
-              >
-                <Link href="/login">Login</Link>
+            {!loggedIn ? (
+              <Button asChild size="sm" variant="outline" className="rounded-full">
+                <Link href={loginHref}>Login</Link>
               </Button>
-            )}
-
-            {loggedIn && (
+            ) : (
               <Button
                 size="sm"
                 variant="destructive"
@@ -127,44 +131,24 @@ export function SiteHeader() {
             </Button>
           </div>
 
-          {/* ✅ Tablet (md to <lg) */}
+          {/* TABLET */}
           <div className="hidden md:flex lg:hidden items-center gap-3 flex-1 justify-end ml-auto">
-            {/* Search icon → opens full-width bar below */}
             <Button
               size="icon"
               variant="outline"
               className="rounded-full"
-              onClick={() => setShowSearch((prev) => !prev)}
+              onClick={() => setShowSearch((p) => !p)}
             >
               <Search className="h-5 w-5" />
             </Button>
 
-            <nav className="flex items-center gap-3 text-sm">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="rounded-full px-3 py-1 text-muted-foreground transition hover:bg-muted hover:text-foreground"
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </nav>
-
             <ThemeToggle />
 
-            {!loggedIn && (
-              <Button
-                asChild
-                size="sm"
-                variant="outline"
-                className="rounded-full"
-              >
-                <Link href="/login">Login</Link>
+            {!loggedIn ? (
+              <Button asChild size="sm" variant="outline" className="rounded-full">
+                <Link href={loginHref}>Login</Link>
               </Button>
-            )}
-
-            {loggedIn && (
+            ) : (
               <Button
                 size="sm"
                 variant="destructive"
@@ -188,14 +172,13 @@ export function SiteHeader() {
             </Button>
           </div>
 
-          {/* ✅ Mobile (< md) */}
+          {/* MOBILE */}
           <div className="flex md:hidden items-center gap-2 ml-auto">
-            {/* Search icon → full-width bar below */}
             <Button
               size="icon"
               variant="outline"
               className="rounded-full"
-              onClick={() => setShowSearch((prev) => !prev)}
+              onClick={() => setShowSearch((p) => !p)}
             >
               <Search className="h-5 w-5" />
             </Button>
@@ -209,17 +192,14 @@ export function SiteHeader() {
                 </Button>
               </SheetTrigger>
 
-              <SheetContent
-                side="top"
-                className="flex flex-col gap-4 pb-6 bg-background shadow-none"
-              >
+              <SheetContent side="top" className="flex flex-col gap-4 pb-6">
                 <SheetHeader>
-                  <SheetTitle className="text-left text-sm font-semibold px-1">
+                  <SheetTitle className="text-left text-sm font-semibold">
                     Menu
                   </SheetTitle>
                 </SheetHeader>
 
-                <nav className="flex flex-col gap-1 mt-2 text-left">
+                <nav className="flex flex-col gap-1">
                   {navLinks.map((link) => (
                     <SheetClose asChild key={link.href}>
                       <Link
@@ -233,18 +213,11 @@ export function SiteHeader() {
                 </nav>
 
                 <div className="flex items-center gap-2 mt-2">
-                  {!loggedIn && (
-                    <Button
-                      asChild
-                      size="sm"
-                      variant="outline"
-                      className="rounded-full"
-                    >
-                      <Link href="/login">Login</Link>
+                  {!loggedIn ? (
+                    <Button asChild size="sm" variant="outline" className="rounded-full">
+                      <Link href={loginHref}>Login</Link>
                     </Button>
-                  )}
-
-                  {loggedIn && (
+                  ) : (
                     <Button
                       size="sm"
                       variant="destructive"
@@ -273,10 +246,10 @@ export function SiteHeader() {
         </div>
       </motion.header>
 
-      {/* ✅ Tablet + Mobile full-width search bar */}
+      {/* MOBILE SEARCH BAR */}
       {showSearch && (
-        <div className="block md:block lg:hidden w-full border-b bg-background px-4 py-3">
-          <div className="w-full md:max-w-3xl mx-auto">
+        <div className="block lg:hidden w-full border-b bg-background px-4 py-3">
+          <div className="mx-auto max-w-3xl">
             <SearchBar />
           </div>
         </div>
