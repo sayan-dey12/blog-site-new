@@ -1,42 +1,47 @@
 "use client";
 
-import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-hot-toast";
+import { useState } from "react";
 
 export default function CommentForm({ blogId }: { blogId: string }) {
-  const { user } = useAuth();
+  const { loggedIn, mounted } = useAuth();
   const [content, setContent] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  if (!mounted) return null;
 
   async function submit() {
-    if (!user) {
-      toast.error("Login required");
+    if (!loggedIn) {
+      toast.error("Login required to comment");
       return;
     }
 
     if (!content.trim()) return;
 
+    setLoading(true);
     await fetch(`/api/blog/${blogId}/comments`, {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ content }),
     });
-
+    setLoading(false);
     setContent("");
-    location.reload(); // ISR refresh (simple & safe)
+
+    location.reload();
   }
 
   return (
-    <div className="mb-8">
+    <div className="mb-6">
       <textarea
         value={content}
-        onChange={e => setContent(e.target.value)}
-        className="w-full rounded-xl border p-3 text-sm
-        dark:bg-gray-900 resize-none"
-        placeholder="Write a comment…"
+        onChange={(e) => setContent(e.target.value)}
+        className="w-full border rounded-lg p-3"
+        placeholder="Write a comment..."
       />
       <button
         onClick={submit}
-        className="mt-3 px-4 py-2 bg-blue-600 text-gray-200 rounded-lg"
+        className="mt-2 px-4 py-2 bg-blue-600 text-white rounded"
       >
         Post Comment
       </button>
